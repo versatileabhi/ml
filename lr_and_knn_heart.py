@@ -1,3 +1,5 @@
+from pathlib import Path
+BASE_DIR=Path(__file__).resolve().parent
 # ============================================================
 # EXPERIMENT 7
 # Classification using Logistic Regression and KNN
@@ -27,7 +29,7 @@ from sklearn.metrics import (
 # Step 2: Load the dataset
 # ------------------------------------------------------------
 
-df = pd.read_csv("heart.csv")
+df = pd.read_csv(BASE_DIR/"heart.csv")
 
 print("First 5 records:")
 print(df.head())
@@ -62,6 +64,9 @@ print(y.head())
 # Step 5: Split data into training and testing
 # ------------------------------------------------------------
 
+vc=y.value_counts()
+X=X[y.isin(vc[vc>=2].index)]
+y=y[y.isin(vc[vc>=2].index)]
 X_train, X_test, y_train, y_test = train_test_split(
     X,
     y,

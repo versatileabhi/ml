@@ -1,3 +1,5 @@
+from pathlib import Path
+BASE_DIR=Path(__file__).resolve().parent
 import pandas as pd
 
 from sklearn.model_selection import train_test_split, GridSearchCV
@@ -8,7 +10,7 @@ from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 # 1. Load dataset (Make sure breast_cancer.csv is in /home/avcoe/ or update path)
-data = pd.read_csv("/home/avcoe/breast_cancer.csv")
+data = pd.read_csv(BASE_DIR/"breast_cancer.csv")
 X = data.drop(columns=["target"])
 y = data.target
 

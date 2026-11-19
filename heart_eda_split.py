@@ -1,3 +1,5 @@
+from pathlib import Path
+BASE_DIR=Path(__file__).resolve().parent
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -8,7 +10,7 @@ sns.set_style("whitegrid")
 plt.style.use("fivethirtyeight")
 
 # Load dataset (Make sure heart.csv is in /home/avcoe/ or update path)
-df = pd.read_csv("/home/avcoe/heart.csv")
+df = pd.read_csv(BASE_DIR/"heart.csv")
 print("First 5 rows:")
 print(df.head())
 
