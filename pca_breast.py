@@ -1,10 +1,12 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from sklearn.datasets import load_breast_cancer
 from sklearn.model_selection import (
     train_test_split, GridSearchCV
 )
 from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
@@ -18,13 +20,44 @@ data = load_breast_cancer()
 X = data.data
 y = data.target
 
-# 2. Split data into training and testing sets
+# 2. PCA Visualization (PC1 vs PC2)
+X_scaled_full = StandardScaler().fit_transform(X)
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled_full)
+
+print("Explained Variance Ratio (PC1, PC2):", pca.explained_variance_ratio_)
+print("Total Variance Explained by 2 Components:", round(sum(pca.explained_variance_ratio_) * 100, 2), "%")
+
+plt.figure(figsize=(8, 6))
+scatter = plt.scatter(
+    X_pca[:, 0],
+    X_pca[:, 1],
+    c=y,
+    cmap="coolwarm",
+    alpha=0.75,
+    edgecolors="k",
+    linewidths=0.4
+)
+plt.xlabel(f"Principal Component 1 ({pca.explained_variance_ratio_[0] * 100:.2f}% variance)")
+plt.ylabel(f"Principal Component 2 ({pca.explained_variance_ratio_[1] * 100:.2f}% variance)")
+plt.title("PCA: PC1 vs PC2 (Breast Cancer Dataset)")
+plt.legend(
+    handles=scatter.legend_elements()[0],
+    labels=list(data.target_names),
+    title="Classes"
+)
+plt.grid(True)
+plt.tight_layout()
+plt.savefig("pca_pc1_vs_pc2.png")
+plt.show()
+
+# 3. Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2,
     random_state=42, stratify=y
 )
 
-# 3. Define models and parameter grids
+# 4. Define models and parameter grids
 models = {
     "SVM": (
         Pipeline([
@@ -56,7 +89,7 @@ models = {
 
 results = []
 
-# 4. Train, evaluate and optimize each model
+# 5. Train, evaluate and optimize each model
 for name, (model, params) in models.items():
 
     # Before optimization
@@ -101,6 +134,6 @@ for name, (model, params) in models.items():
         "Best Parameters": str(grid.best_params_)
     })
 
-# 5. Display results
+# 6. Display results
 df = pd.DataFrame(results)
-print(df.to_string(index=False))
+print("\n" + df.to_string(index=False))
