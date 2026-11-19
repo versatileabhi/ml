@@ -11,8 +11,16 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 
 # 1. Load dataset (Make sure breast_cancer.csv is in /home/avcoe/ or update path)
 data = pd.read_csv(BASE_DIR/"breast_cancer.csv")
-X = data.drop(columns=["target"])
-y = data.target
+t_col="target" if "target" in data.columns else ("diagnosis" if "diagnosis" in data.columns else data.columns[-1])
+y_raw = data[t_col]
+y = y_raw.map({"M":0,"B":1,"malignant":0,"benign":1}).fillna(y_raw) if y_raw.dtype=="object" else y_raw
+data = data.dropna(axis=1, how="all")
+data = data.dropna(axis=1, how="all")
+t_col = "target" if "target" in data.columns else ("diagnosis" if "diagnosis" in data.columns else data.columns[-1])
+y = data[t_col].astype(str).str.strip().map({"M": 0, "B": 1, "1": 1, "0": 0})
+if y.isna().any(): y = pd.Series(pd.factorize(data[t_col])[0], index=data.index)
+X = data.drop(columns=[t_col, "id"], errors="ignore").select_dtypes(include="number")
+X = X.fillna(X.median(numeric_only=True))
 
 # 2. Split data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(
